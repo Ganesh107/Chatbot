@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from app.rag_engine import RAGEngine
+from app.rag_engine import RAGEngine 
 
 app = FastAPI()
 rag = RAGEngine()

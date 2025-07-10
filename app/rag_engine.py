@@ -13,14 +13,11 @@ class RAGEngine:
 
     def build_prompt(self, context, question):
         return f"""You are a helpful assistant. Use the context below to answer the question.
-
-Context:
-{context}
-
-Question:
-{question}
-
-Answer:"""
+        Context:
+        {context}
+        Question:
+        {question}
+        Answer:"""
 
     def call_mistral(self, prompt):
         response = requests.post(
@@ -31,8 +28,9 @@ Answer:"""
                 "stream": False
             }
         )
-        return response.json()["response"]
-
+        response = response.json()["response"]
+        return response if "The context provided does not" not in response else "I'm sorry, I don't have enough information to answer that question."
+    
     def answer_question(self, question):
         q_vec = np.array([self.embedder.encode([question])[0]])
         top_contexts = self.vstore.search(q_vec)
