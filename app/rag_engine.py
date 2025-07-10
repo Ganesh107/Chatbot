@@ -35,5 +35,7 @@ class RAGEngine:
         q_vec = np.array([self.embedder.encode([question])[0]])
         top_contexts = self.vstore.search(q_vec)
         context = "\n".join(top_contexts)
+        if not context:
+            return "I'm sorry, I don't have enough information to answer that question."
         prompt = self.build_prompt(context, question)
         return self.call_mistral(prompt)
