@@ -3,6 +3,7 @@ from app.embedder import Embedder
 from app.vector_store import VectorStore
 import numpy as np
 import requests
+from app.constants import Constants 
 
 class RAGEngine:
     def __init__(self):
@@ -21,7 +22,7 @@ class RAGEngine:
 
     def call_mistral(self, prompt):
         response = requests.post(
-            "http://localhost:11434/api/generate",
+            Constants.llm_endpoint,
             json={
                 "model": "mistral",
                 "prompt": prompt,
@@ -29,13 +30,13 @@ class RAGEngine:
             }
         )
         response = response.json()["response"]
-        return response if "The context provided does not" not in response else "I'm sorry, I don't have enough information to answer that question."
+        return response if "context" not in response else Constants.invalid_context
     
     def answer_question(self, question):
         q_vec = np.array([self.embedder.encode([question])[0]])
         top_contexts = self.vstore.search(q_vec)
         context = "\n".join(top_contexts)
         if not context:
-            return "I'm sorry, I don't have enough information to answer that question."
+            return Constants.invalid_context
         prompt = self.build_prompt(context, question)
         return self.call_mistral(prompt)
